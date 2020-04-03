@@ -2,18 +2,18 @@ package com.example.corolavirus;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.example.Controller.GameSurface;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // Set fullscreen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -24,5 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Sét đặt giao diện của Activity.
         this.setContentView(new GameSurface(this));
+
+
     }
 }

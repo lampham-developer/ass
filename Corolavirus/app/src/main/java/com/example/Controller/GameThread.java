@@ -17,9 +17,27 @@ public class GameThread extends Thread{
     public void run() {
         super.run();
         while (running){
-            this.gameSurface.update();
+            Canvas canvas= null;
             try {
-                this.sleep((int)1000/60);
+                // Lấy ra đối tượng Canvas và khóa nó lại.
+                canvas = this.surfaceHolder.lockCanvas();
+
+
+                // Đồng bộ hóa.
+                synchronized (canvas)  {
+                    this.gameSurface.update();
+                    this.gameSurface.draw(canvas);
+                }
+            }catch(Exception e)  {
+                // Không làm gì
+            } finally {
+                if(canvas!= null)  {
+                    // Mở khóa cho Canvas.
+                    this.surfaceHolder.unlockCanvasAndPost(canvas);
+                }
+            }
+            try {
+                this.sleep((int)100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

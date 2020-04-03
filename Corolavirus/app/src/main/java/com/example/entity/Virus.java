@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
 
@@ -8,27 +9,34 @@ import com.example.Controller.GameSurface;
 
 public class Virus extends GameObject {
 
-    public static final float VELOCITY = 0.1f;
-
-    private int movingVectorX;
-    private int movingVectorY;
-    private long lastTime = -1;
+    private long lastTime;
     private GameSurface gameSurface;
+    private Bitmap[] listBitmap;
+    private int curentBitmap = 1;
 
 
-    public Virus(Context context, int movingVectorX, int movingVectorY, long lastTime, GameSurface gameSurface) {
-        super(context);
-        this.movingVectorX = movingVectorX;
-        this.movingVectorY = movingVectorY;
+    public Virus(float VELOCITY, int movingVectorX, int movingVectorY, int hp, Bitmap image, int width, int height, int x, int y, long lastTime, GameSurface gameSurface) {
+        super(VELOCITY, movingVectorX, movingVectorY, hp, image, width, height, x, y);
         this.lastTime = lastTime;
         this.gameSurface = gameSurface;
+
+        listBitmap = new Bitmap[2];
+        listBitmap[0] = this.createSubImageAt(1, 0);
+        listBitmap[1] = this.createSubImageAt(1, 1);
     }
 
     public void update(){
-        // Thời điểm hiện tại theo nano giây.
+        if(curentBitmap == 0) curentBitmap = 1;
+        else curentBitmap = 0;
+
         long now = System.nanoTime();
+        // Chưa vẽ lần nào.
+        if(lastTime==-1) {
+            lastTime= now;
+        }
+
         // Đổi nano giây ra mili giây (1 nanosecond = 1000000 millisecond).
-        int deltaTime = (int) (1000/60);
+        int deltaTime = (int) ((now - lastTime)/ 1000000 );
 
 
         // Quãng đường mà nhân vật đi được (fixel).
@@ -38,30 +46,36 @@ public class Virus extends GameObject {
 
 
         // Tính toán vị trí mới của nhân vật.
-        this.setX(this.getX() +  (int)(distance* movingVectorX / movingVectorLength));
-        this.setY(this.getY()+  (int)(distance* movingVectorY / movingVectorLength));
+        this.x = x +  (int)(distance* movingVectorX / movingVectorLength);
+        this.y = y +  (int)(distance* movingVectorY / movingVectorLength);
 
         // Khi nhân vật của game chạm vào cạnh của màn hình thì đổi hướng.
 
-        if(this.getX() < 0 )  {
-            this.setX(0);
+        if(this.x < 0 )  {
+            this.x = 0;
             this.movingVectorX = - this.movingVectorX;
-        } else if(this.getX() > this.gameSurface.getWidth() - this.getWidth())  {
-            this.setX(this.gameSurface.getWidth()-this.getWidth());
+        } else if(this.x > this.gameSurface.getWidth() - width)  {
+            this.x= this.gameSurface.getWidth()-width;
             this.movingVectorX = - this.movingVectorX;
         }
 
-        if(this.getY() < 0 )  {
-            this.setY(0);
+        if(this.y < 0 )  {
+            this.y = 0;
             this.movingVectorY = - this.movingVectorY;
-        } else if(this.getY() > this.gameSurface.getHeight()- this.gameSurface.holderHeight)  {
-            this.setY(this.gameSurface.getHeight()- this.gameSurface.holderHeight);
+        } else if(this.y > this.gameSurface.getHeight()/2)  {
+            this.y= this.gameSurface.getHeight()/2;
             this.movingVectorY = - this.movingVectorY ;
         }
 
-
     }
 
+
+    public void draw(Canvas canvas){
+
+        Bitmap bitmap = listBitmap[curentBitmap];
+        canvas.drawBitmap(bitmap , x , y , null);
+        lastTime = System.nanoTime();
+    }
 
     public int getMovingVectorX() {
         return movingVectorX;
@@ -77,5 +91,21 @@ public class Virus extends GameObject {
 
     public void setMovingVectorY(int movingVectorY) {
         this.movingVectorY = movingVectorY;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public float getVELOCITY() {
+        return VELOCITY;
+    }
+
+    public void setVELOCITY(float VELOCITY) {
+        this.VELOCITY = VELOCITY;
     }
 }
